@@ -68,6 +68,8 @@ outputs:
     description: 'The paths of the generated artifacts'
   appVersion:
     description: 'The version of the app'
+  renameArtifacts:
+    description: 'Whether to rename the artifacts to include the app name and version'
 runs:
   using: 'node20'
   main: 'dist/index.js'
