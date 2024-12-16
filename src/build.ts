@@ -1,5 +1,5 @@
 import { existsSync, renameSync } from 'node:fs';
-import { join } from 'node:path';
+import path, { join } from 'node:path';
 
 import { initProject } from './init-project';
 import { getRunner } from './runner';
@@ -303,16 +303,15 @@ export async function buildProject(
   }
 
   // try to rename the artifacts
-  artifacts = artifacts.map((a) => {
-    console.log('a.path:', a.path, 'renameArtifacts:', renameArtifacts);
-    if (renameArtifacts && /[\u4e00-\u9fa5]/.test(a.path)) {
+  artifacts = artifacts.map((artifact) => {
+    if (renameArtifacts && /[\u4e00-\u9fa5]/.test(artifact.path)) {
       // replace the Chinese part with renameArtifacts and modify the original file name
-      const newPath = a.path.replace(/[\u4e00-\u9fa5]+/g, renameArtifacts);
-      renameSync(a.path, newPath);
-      console.log('Renamed artifact:', a.path, '->', newPath);
-      a.path = newPath;
+      const newPath = artifact.path.replace(/[\u4e00-\u9fa5]+/g, renameArtifacts);
+      renameSync(artifact.path, newPath);
+      console.log('Renamed artifact:', path.basename(artifact.path), '->', path.basename(newPath));
+      artifact.path = newPath;
     }
-    return a;
+    return artifact;
   });
 
   console.log(
