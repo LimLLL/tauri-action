@@ -58,7 +58,7 @@ inputs:
   repo:
     description: 'The name of the repository'
   renameArtifacts:
-    description: 'Whether to rename the artifacts to include the app name and version'
+    description: 'Whether to rename the artifacts or not, if yes, enter a string that will be used as a prefix for the artifacts'
 outputs:
   releaseId:
     description: 'The ID of the created release'
