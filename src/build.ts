@@ -304,6 +304,7 @@ export async function buildProject(
 
   // try to rename the artifacts
   artifacts = artifacts.map((a) => {
+    console.log('a.path:', a.path, 'renameArtifacts:', renameArtifacts);
     if (renameArtifacts && /[\u4e00-\u9fa5]/.test(a.path)) {
       // replace the Chinese part with renameArtifacts and modify the original file name
       const newPath = a.path.replace(/[\u4e00-\u9fa5]+/g, renameArtifacts);
