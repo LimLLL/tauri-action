@@ -1,4 +1,4 @@
-import { existsSync, renameSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { resolve, dirname, basename } from 'node:path';
 
 import * as core from '@actions/core';
@@ -85,6 +85,7 @@ async function run(): Promise<void> {
           buildOptions,
           initOptions,
           retryAttempts,
+          renameArtifacts
         )),
       );
     }
@@ -96,31 +97,32 @@ async function run(): Promise<void> {
           buildOptions,
           initOptions,
           retryAttempts,
+          renameArtifacts
         )),
       );
     }
-    // const artifacts = releaseArtifacts.concat(debugArtifacts);
-    const artifacts = releaseArtifacts.map((a) => {
-      if (renameArtifacts && /[\u4e00-\u9fa5]/.test(a.path)) {
-        // 把中文部分替换为renameArtifacts，并修改原文件名
-        const newPath = a.path.replace(/[\u4e00-\u9fa5]+/g, renameArtifacts);
-        if (newPath !== a.path) {
-          renameSync(a.path, newPath);
-          a.path = newPath;
-        }
-      }
-      return a;
-    }).concat(debugArtifacts.map((a) => {
-      if (renameArtifacts && /[\u4e00-\u9fa5]/.test(a.path)) {
-        // 把中文部分替换为renameArtifacts，并修改原文件名
-        const newPath = a.path.replace(/[\u4e00-\u9fa5]+/g, renameArtifacts);
-        if (newPath !== a.path) {
-          renameSync(a.path, newPath);
-          a.path = newPath;
-        }
-      }
-      return a;
-    }));
+    const artifacts = releaseArtifacts.concat(debugArtifacts);
+    // const artifacts = releaseArtifacts.map((a) => {
+    //   if (renameArtifacts && /[\u4e00-\u9fa5]/.test(a.path)) {
+    //     // 把中文部分替换为renameArtifacts，并修改原文件名
+    //     const newPath = a.path.replace(/[\u4e00-\u9fa5]+/g, renameArtifacts);
+    //     if (newPath !== a.path) {
+    //       renameSync(a.path, newPath);
+    //       a.path = newPath;
+    //     }
+    //   }
+    //   return a;
+    // }).concat(debugArtifacts.map((a) => {
+    //   if (renameArtifacts && /[\u4e00-\u9fa5]/.test(a.path)) {
+    //     // 把中文部分替换为renameArtifacts，并修改原文件名
+    //     const newPath = a.path.replace(/[\u4e00-\u9fa5]+/g, renameArtifacts);
+    //     if (newPath !== a.path) {
+    //       renameSync(a.path, newPath);
+    //       a.path = newPath;
+    //     }
+    //   }
+    //   return a;
+    // }));
 
     if (artifacts.length === 0) {
       if (releaseId || tagName) {

@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { initProject } from './init-project';
@@ -19,6 +19,7 @@ export async function buildProject(
   buildOpts: BuildOptions,
   initOpts: InitOptions,
   retryAttempts: number,
+  renameArtifacts: string
 ): Promise<Artifact[]> {
   const runner = await getRunner(root, buildOpts.tauriScript);
 
@@ -50,6 +51,7 @@ export async function buildProject(
 
   const info = getInfo(root, targetInfo, configArg);
 
+
   if (!info.tauriPath) {
     throw Error("Couldn't detect path of tauri app");
   }
@@ -70,9 +72,9 @@ export async function buildProject(
     root,
     targetInfo.platform === 'macos'
       ? {
-          TAURI_BUNDLER_DMG_IGNORE_CI:
-            process.env.TAURI_BUNDLER_DMG_IGNORE_CI ?? 'true',
-        }
+        TAURI_BUNDLER_DMG_IGNORE_CI:
+          process.env.TAURI_BUNDLER_DMG_IGNORE_CI ?? 'true',
+      }
       : undefined,
     retryAttempts,
   );
@@ -299,6 +301,18 @@ export async function buildProject(
       );
     }
   }
+
+  // try to rename the artifacts
+  artifacts = artifacts.map((a) => {
+    if (renameArtifacts && /[\u4e00-\u9fa5]/.test(a.path)) {
+      // replace the Chinese part with renameArtifacts and modify the original file name
+      const newPath = a.path.replace(/[\u4e00-\u9fa5]+/g, renameArtifacts);
+      renameSync(a.path, newPath);
+      console.log('Renamed artifact:', a.path, '->', newPath);
+      a.path = newPath;
+    }
+    return a;
+  });
 
   console.log(
     `Looking for artifacts in:\n${artifacts.map((a) => a.path).join('\n')}`,
